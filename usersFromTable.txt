@@ -1,0 +1,3 @@
+uzivatel-uzivatel
+uzivatel1-rndpsw
+test-test
