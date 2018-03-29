@@ -5,6 +5,7 @@ import threading
 import time
 import logging
 
+threading.current_thread().name = "PurkiadaServer"
 try:
     import loadTable
     tableFile = "tady musim nadefinovat globalni promennou, abych ji pak mohl pouzit ve funkci"
@@ -42,7 +43,7 @@ while True:
             for user in accs:
                 if "\n" in user:
                     accsNew.append(user[:-1])
-                    print(user[:-1])
+                    #print(user[:-1])
             accs = accsNew
             del accsNew
             users_file.close()
@@ -321,30 +322,15 @@ logging.info("Server started on {}:{}".format(name[0], name[1]))
 loadPanel()
 #print(name)
 soc.listen(1)
-banner2 = r"""
- _______                    __       __                __                  ______   ______    __    ______
-/       \                  /  |     /  |              /  |                /      \ /      \ _/  |  /      \
-$$$$$$$  |__    __  ______ $$ |   __$$/  ______   ____$$ | ______        /$$$$$$  /$$$$$$  / $$ | /$$$$$$  |
-$$ |__$$ /  |  /  |/      \$$ |  /  /  |/      \ /    $$ |/      \       $$____$$ $$$  \$$ $$$$ | $$ \__$$ |
-$$    $$/$$ |  $$ /$$$$$$  $$ |_/$$/$$ |$$$$$$  /$$$$$$$ |$$$$$$  |       /    $$/$$$$  $$ | $$ | $$    $$<
-$$$$$$$/ $$ |  $$ $$ |  $$/$$   $$< $$ |/    $$ $$ |  $$ |/    $$ |      /$$$$$$/ $$ $$ $$ | $$ |  $$$$$$  |
-$$ |     $$    $$/$$ |     $$ | $$  $$ $$    $$ $$    $$ $$    $$ |      $$       $$   $$$// $$   $$    $$/
-$$/       $$$$$$/ $$/      $$/   $$/$$/ $$$$$$$/ $$$$$$$/ $$$$$$$/       $$$$$$$$/ $$$$$$/ $$$$$$/ $$$$$$/
-
-
-
-"""
-
 banner = r"""
------------------------------------------------------------------
-  _____            _    _           _         ___   ___ __  ___
- |  __ \          | |  (_)         | |       |__ \ / _ /_ |/ _ \
- | |__) _   _ _ __| | ___  __ _  __| | __ _     ) | | | | | (_) |
- |  ___| | | | '__| |/ | |/ _` |/ _` |/ _` |   / /| | | | |> _ <
- | |   | |_| | |  |   <| | (_| | (_| | (_| |  / /_| |_| | | (_) |
- |_|    \__,_|_|  |_|\_|_|\__,_|\__,_|\__,_| |____|\___/|_|\___/
- 
------------------------------------------------------------------
+---------------------------------------------------------------------------
+  _____               _     _             _          ___    ___  __   ___  
+ |  __ \             | |   (_)           | |        |__ \  / _ \/_ | / _ \ 
+ | |__) |_   _  _ __ | | __ _   __ _   __| |  __ _     ) || | | || || (_) |
+ |  ___/| | | || '__|| |/ /| | / _` | / _` | / _` |   / / | | | || | \__, |
+ | |    | |_| || |   |   < | || (_| || (_| || (_| |  / /_ | |_| || |   / / 
+ |_|     \__,_||_|   |_|\_\|_| \__,_| \__,_| \__,_| |____| \___/ |_|  /_/  
+---------------------------------------------------------------------------
 """
 def one_user(c, a):
     try:
@@ -360,12 +346,14 @@ def one_user(c, a):
             #print("WHILE")
             data = c.recv(1024).decode("utf8")
             user.name = data.split("-")[0]
+            global cThread
+            cThread.name = "User {}".format(user.name)
             user.pswd = data.split("-")[1]
             global accs
-            logging.info("Accs: {}".format(accs))
-            logging.info("Entred credentials: {}".format(data))
+            #logging.info("Accs: {}".format(accs))
+            #logging.info("Entred credentials: {}".format(data))
             for username in accs:
-                logging.info("aaaA:{}:Aaaa".format(username))
+                #logging.info("aaaA:{}:Aaaa".format(username))
                 if data == username:
                     print("True")
                     c.send("True".encode())

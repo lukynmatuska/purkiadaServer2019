@@ -23,11 +23,11 @@ class TableToTxt():
 		self.data = [[self.sheet.cell_value(r,c) for c in range(self.sheet.ncols)] for r in range(self.sheet.nrows)]
 		self.users = []
 		for i in range(1, len(self.data)):
-			if i != "":
+			if self.data[i][4] != "":
 				self.users.append(self.data[i][4]) #1
 		self.pswds = []
 		for i in range(1, len(self.data)):
-			if i != "":
+			if self.data[i][3] != "":
 				self.pswds.append(self.data[i][3]) #2
 		logging.info("Successfully loaded {} users.".format(len(self.users)))
 		self.save()
