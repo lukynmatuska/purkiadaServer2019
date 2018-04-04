@@ -8,6 +8,7 @@
   - **debuging**  - print info in console
   - **threading** - multitasking
   - **time**      - time recording
+  - **socket**    - core of the project
 
 ## Enterprise education edition :smiley:
 

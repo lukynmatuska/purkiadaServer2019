@@ -5,7 +5,7 @@ import threading
 import time
 import logging
 
-threading.current_thread().name = "PurkiadaServer"
+threading.current_thread().name = "Server"
 try:
     import loadTable
     tableFile = "tady musim nadefinovat globalni promennou, abych ji pak mohl pouzit ve funkci"
@@ -21,14 +21,19 @@ try:
     tableThread.setDaemon(True)
     tableThread.start()
 
-except Exception as problem:
-    logging.info("Error: \"{}\"\n".format(problem))
+except Exception as e:
+    logging.info("Error: \"{}\"\n".format(e))
     #logging.info("Something gone wrong! You might not install Python \"xlrd\" library")
+    input(".: EXIT :.")
     exit()
 
 
 def loadPanel():
-    import purkiadaServerPanel
+    try:
+    	import purkiadaServerPanel
+    
+    except Exception as e:
+    	logging.info("Error: \"{}\"\n".format(e))
 
 
 path = "home/"  # "default" ukazatel v jaké jsem složce
@@ -79,7 +84,7 @@ class User():
                     logging.info("Read score failed for user {}".format(self.name))
             self.scoreFile.close()
             logging.info("Successfully loaded score for user {}".format(self.name))
-            logging.info("{}´s score: {}".format(self.name, self.score))
+            logging.info("Score: {}".format(self.score))
         except:
             logging.info("Read score failed for user \"{}\"".format(self.name))
             self.scoreFile = open("usersScore//{}.txt".format(self.name), "a")
@@ -107,11 +112,14 @@ class User():
         self.score += score
         try:
             self.scoreFile = open("usersScore//{}.txt".format(self.name), "w")#"a"
-            self.scoreFile.write(self.score)
+            self.scoreFile.write(str(self.score))
             self.scoreFile.close()
-        except:
-            logging.info("Write score failed for user {}".format(self.name))
-        logging.info("{}´s score: {}".format(self.name, self.score))
+            self.scoreLoad()
+            logging.info("Score: {}".format(self.score))
+        except Exception as e:
+        	logging.info("Error: \"{}\"\n".format(e))
+            #logging.info("Write score failed for user {}".format(self.name))
+        
 
     def cd(self):
         self.pathList2 = self.path.split("/")
@@ -313,6 +321,7 @@ try:
         soc.bind(("0.0.0.0", 9600))
 except Exception as problem:
     logging.info("Can´t start server, because {}".format(problem))
+    input(".: EXIT :.")
     exit()
 
 
@@ -347,7 +356,7 @@ def one_user(c, a):
             data = c.recv(1024).decode("utf8")
             user.name = data.split("-")[0]
             global cThread
-            cThread.name = "User {}".format(user.name)
+            cThread.name = "User \"{}\"".format(user.name)
             user.pswd = data.split("-")[1]
             global accs
             #logging.info("Accs: {}".format(accs))
@@ -355,15 +364,18 @@ def one_user(c, a):
             for username in accs:
                 #logging.info("aaaA:{}:Aaaa".format(username))
                 if data == username:
-                    print("True")
+                    #print("True")
+                    logging.info("Successfully logged in")
                     c.send("True".encode())
                     user.connected = True
                     user.scoreAdd(1)
-                    user.scoreLoad()
+                    #user.scoreLoad()
                     #here we must add user to connected users (list)
                     connectedUsers.append(user)
                     connectedUsersNames.append(user.name)
-                    print(connectedUsersNames)
+                    logging.info("Connected users: {}".format(len(connectedUsers)))
+                    logging.info("Connected users: {}".format(connectedUsersNames))
+                    #print(connectedUsersNames)
                     #break #- BACHAAA
                 """
                 for username in users:
@@ -381,27 +393,30 @@ def one_user(c, a):
 
         while True:
             action = c.recv(1024).decode("utf8")
-            #print("action: \"{}\"".format(action))
-            #userLog = open("/home/hojang/Users_Logs/"+user.name + "_Log.txt", "a")
-            userLog = open("C:\\Users\\buchmaier.jan\\Desktop\\User_Log\\{}_Log.txt".format(user.name), "a")
-            #user.scoreLoad()
-            #userLog.write(action+"\n")
-            userLog.write("[{}] {}: {}\n".format(time.time(),user.path, action))
-            userLog.close()
+            
+            try:
+            	userLog = open("Logs\\{}_Log.txt".format(user.name), "a")
+            	userLog.write("[{}] {}: {}\n".format(time.time(),user.path, action))
+            	userLog.close()
+            except Exception as e:
+             	logging.info(e)
+            
             if action == "read secret_message.txt" and user.path == "home/root/desktop/":
-                file = open("C:\\Users\\buchmaier.jan\\Desktop\\finished_Users.txt", "a")
-                file.write(user.name + " "+ "Done \n")
+                file = open("finishedUsers\\finished_Users.txt", "a")
+                file.write("{} Done\n".format(user.name))
+                #file.write(user.name + " "+ "Done \n")
                 file.close()
+
             if action == "bcad" + " " + user.admin_pass:
-                file = open("C:\\Users\\buchmaier.jan\\Desktop\\finished_Users.txt", "a")
-                file.write(user.name + " "+ "Is now Admin \n")
+                file = open("finishedUsers\\finished_Users.txt", "a")
+                file.write("{} is now Admin\n".format(user.name))
                 file.close()
+
             if action != "disconnect":
                 user.acess = False
                 user.answerToClient = "None"
                 answ = user.run(action)
-                print("user.acess: {} ; user.name: {}".format(user.acess, user.name))
-                    #if user.acess == True:
+                logging.info("user.acess: {}; user.name: {}; user.path: {}".format(user.acess, user.name, user.path))
                 if user.acess:
                     c.send("True".encode())
                 else:
@@ -420,14 +435,31 @@ def one_user(c, a):
         c.close()
 
 def htmlUsers():
-    purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"))
-    #purkiadaServerPanel.status.content += purkiadaServerPanel.h3("Active users:")
-    purkiadaServerPanel.status.add(purkiadaServerPanel.p(connectedUsersNames))
-    #purkiadaServerPanel.status.content += purkiadaServerPanel.p(connectedUsers)
-    purkiadaServerPanel.logging.info("Successfully started!")
+	import purkiadaServerPanel
+	import time
+	while True:
+		try:
+			purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+			purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"))
+			with purkiadaServerPanel.ul():
+				if len(connectedUsersNames) > 0:
+					for userName in connectedUsersNames:
+						purkiadaServerPanel.status.add(purkiadaServerPanel.li(str(userName))) #connectedUsersNames)))
+				else:
+					purkiadaServerPanel.status.add(purkiadaServerPanel.li("Nikdo se jeste nepripojil!")) #connectedUsersNames)))
+			purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+			purkiadaServerPanel.status.add(purkiadaServerPanel.p("Last update on {}".format(time.asctime( time.localtime(time.time()) ))))
+			#.format(time.asctime( time.localtime(time.time()) ))
+			#purkiadaServerPanel.status.content += purkiadaServerPanel.p(connectedUsers)
+			purkiadaServerPanel.logging.info("Successfully writted!")
+			
+		except Exception as e:
+			logging.info("Error: {}".format(e))
+		time.sleep(10)
 
-panelThread = threading.Thread(name="Server panel", target=htmlUsers)
+panelThread = threading.Thread(name="HTML Status", target=htmlUsers)
 panelThread.setDaemon(True)
+panelThread.start()
 #htmlUsers()
 
 while True:

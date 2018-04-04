@@ -1,9 +1,10 @@
-file = open("C:\\Users\\buchmaier.jan\\Desktop\\finished_Users.txt")
+#file = open("C:\\Users\\buchmaier.jan\\Desktop\\finished_Users.txt")
+file = open("finishedUsers\\finished_Users.txt")
 read = file.readlines()
 udelali = []
 skoroudelali = []
 for i in read:
-    if "Done" in i:
+    if "Done" in i and i.split(" ")[0] not in udelali:
         i = i.split(" ")
         udelali.append(i[0])
 
@@ -12,14 +13,17 @@ for i in read:
         skoroudelali.append(i[0])
 file.close()
 print("-------------------------------------------")
-print("           Udelali :                       ")
+print("           Udelali: {}".format(len(udelali)))
 for i in udelali:
     print(i)
-print("--------------------------------------------")
-print("           ziskali heslo admina:            ")
+print("-------------------------------------------")
+print("           Ziskali heslo admina:            ")
 for i in skoroudelali:
     if i not in udelali:
         print(i)
 if len(skoroudelali) == len(udelali):
     print("ALL USERS HAS DONE IT")
-print(len(udelali))
+
+
+
+input(".: EXIT :.")

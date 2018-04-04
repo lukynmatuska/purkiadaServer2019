@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
-import xlrd
-import logging
+try:
+	import logging
+except Exception as e:
+	print(e)
+
+try:
+	import xlrd
+except Exception as e:
+	print(e)
+	logging.info("Error: \"{}\"".fromat(e))
+
+
 #import threading
 
 logging.basicConfig(level=logging.DEBUG,
@@ -44,7 +54,7 @@ class TableToTxt():
 					povedeno = False
 		self.txtFile.close()
 		if povedeno:
-			logging.info("Successfully saved {} users.".format(len(self.users)))
+			logging.info("Successfully saved  {} users.".format(len(self.users)))
 
 
 """
