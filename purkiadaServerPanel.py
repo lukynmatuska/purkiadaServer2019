@@ -53,6 +53,9 @@ class HtmlPage():
         with self.page.head: #Head editing
             link(rel='stylesheet', href="http://cdn.muicss.com/mui-0.9.30/css/mui.min.css")#style.css')
             script(type='text/javascript', src="http://cdn.muicss.com/mui-0.9.30/js/mui.min.js")#script.js")
+            script(type='text/javascript', src="timer.js")#script.js")
+            #meta(http-equiv="refresh", content="9")
+            # <meta http-equiv="refresh" content="7;url=http://carodky.buchticka.eu/">
 
         with self.page.body: #Body editing
             with div(cls="mui-container"):
@@ -60,7 +63,7 @@ class HtmlPage():
                     with div(style="text-align:center"):
                         h1(self.title)
                         #logging.info("self.menuList: {}".format(self.menuList))
-                        for name in self.menuList:
+                        for name in self.menuList:  # MENU generating
                             #logging.info("NAME: {}".format(name))
                             if name == "home" or name == "Home":
                                 with a(href='./index.html'):
@@ -72,14 +75,17 @@ class HtmlPage():
                                     #p(name, style="margin-left:auto;margin-right:auto;margin-top:auto;margin-bottom:auto;",cls="mui-btn mui-btn--primary mui-btn--raised")
                                     
                     hr()
-                    if type(self.content) == str:
+                    if type(self.content) == str and self.content != "":
                         p(self.content)
                         div(self.content)
                     elif type(self.content) == list:
-                        for i in self.content:
-                            div(i)
+                        for c in self.content:
+                            if not type(c) == type(div()):
+                                p(c)
+                            else:
+                                div(c)
                     else:
-                        div(p(str(self.content)))
+                        str(self.content)
                         
                     with div(cls="paticka", style="text-alig: center;"):
                         hr()
@@ -104,8 +110,8 @@ class HtmlPage():
                 self.f1.close()
                 #print("\nFILE NAME: {}{}.html".format(self.htmlFileName, self.i))
                 break
-            except:
-                print("Error with saving html file!")
+            except Exception as e:
+                logging.info("Error: \"{}\"".format(e))
                 self.i += 1
 
         #self.htmlFileName = "index"
@@ -120,16 +126,37 @@ class HtmlPage():
                 logging.info("Error: \"{}\"".format(e))
                 #print("Error with saving html file! to C:\\xampp\\htdocs\\purkiadaServer2018\\")
 
-    def add(self, a):
+    def add(self, a, text="Undefined"):
         #self.content += "{}".format(a)
+        self.casteTexty = ["Active users:", "Nikdo se jeste nepripojil!"]
+        self.poprve = True
         try:
             if self.lastAdd == a:
                 self.save()
-            elif a not in self.content:
+            elif a not in self.content and text not in self.casteTexty:
                 self.content.append(a)
-                logging.info("Added: {}".format(a))
+                #logging.info("Added: {}".format(a))
+                
+                #logging.info("Type: {}".format(type(self.content[self.content.index(a)-1])))
+                #logging.info("Type: {}".format(type(self.content[self.content.index(a)])))
+                i = 1
+                while not type(self.content[self.content.index(a)-i]) == type(self.content[self.content.index(a)]):
+                    #logging.info("Type: {}".format(type(self.content[self.content.index(a)-i])))
+                    i+=1
+                    
+                if text != "user" and type(self.content[self.content.index(a)-i]) == type(self.content[self.content.index(a)]) and self.content[self.content.index(a)-i] != self.content[self.content.index(a)]:
+                    #logging.info("Deleting: {}".format(self.content[self.content.index(a)-i]))
+                    del self.content[self.content.index(a)-i]
+                #logging.info(str(self.content))
                 #self.update()
                 self.save()
+
+            elif self.poprve:
+                self.content.append(a)
+                #logging.info("Added: {}".format(a))
+                #self.update()
+                self.save()
+                self.poprve = False
 
         except Exception as e:
             logging.info(e)
