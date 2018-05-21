@@ -107,3 +107,10 @@ ENV/
 /usersScore
 table*.xlsx*
 /Logs
+example.ini
+pyQt_sracka.py
+QtConsole_GUI.py
+testik.py
+testik*.*
+embed_qtconsole.py.py
+inprocess_qtconsole.py
