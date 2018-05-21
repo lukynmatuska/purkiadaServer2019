@@ -69,7 +69,7 @@ while True:
 
 connectedUsers = []
 connectedUsersNames = []
-
+statusUsersName = []
 
 class User():
     def scoreLoad(self):
@@ -311,6 +311,22 @@ home.add(root)
 
 # f1 = File("text.txt", "hello world",default_acess_list)
 
+class Server():
+	"""docstring for Server"""
+	def __init__(self, arg):
+		soc = socket.socket()
+		try:
+		    if len(sys.argv) > 1:
+		        logging.info("Trying to start server on *:{}".format(sys.argv[1]))
+		        soc.bind(("0.0.0.0", int(sys.argv[1])))
+		    else:
+		        logging.info("Trying to start server on *:9600")
+		        soc.bind(("0.0.0.0", 9600))
+		except Exception as problem:
+		    logging.info("Can´t start server, because {}".format(problem))
+		    input(".: EXIT :.")
+		    exit()
+		
 soc = socket.socket()
 try:
     if len(sys.argv) > 1:
@@ -437,25 +453,31 @@ def one_user(c, a):
 def htmlUsers():
 	import purkiadaServerPanel
 	import time
+	poprve = True
 	while True:
 		try:
+			if len(connectedUsersNames) > 0:
+				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+				#purkiadaServerPanel.status.add(purkiadaServerPanel.ul())
+				for userName in connectedUsersNames:
+					if userName not in statusUsersName:
+						purkiadaServerPanel.status.add(purkiadaServerPanel.li(str(userName)), "user") #connectedUsersNames)))
+						statusUsersName.append(userName)
+			elif poprve:
+				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+				purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"), "Active users:")
+				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+				purkiadaServerPanel.status.add(purkiadaServerPanel.li("Nikdo se jeste nepripojil!"), "Nikdo se jeste nepripojil!") #connectedUsersNames)))
+				poprve = False
 			purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-			purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"))
-			with purkiadaServerPanel.ul():
-				if len(connectedUsersNames) > 0:
-					for userName in connectedUsersNames:
-						purkiadaServerPanel.status.add(purkiadaServerPanel.li(str(userName))) #connectedUsersNames)))
-				else:
-					purkiadaServerPanel.status.add(purkiadaServerPanel.li("Nikdo se jeste nepripojil!")) #connectedUsersNames)))
-			purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-			purkiadaServerPanel.status.add(purkiadaServerPanel.p("Last update on {}".format(time.asctime( time.localtime(time.time()) ))))
+			purkiadaServerPanel.status.add(purkiadaServerPanel.p("Last update on {}".format(time.asctime( time.localtime(time.time()) ))), "Last update on")
 			#.format(time.asctime( time.localtime(time.time()) ))
 			#purkiadaServerPanel.status.content += purkiadaServerPanel.p(connectedUsers)
 			purkiadaServerPanel.logging.info("Successfully writted!")
 			
 		except Exception as e:
 			logging.info("Error: {}".format(e))
-		time.sleep(10)
+		time.sleep(5)
 
 panelThread = threading.Thread(name="HTML Status", target=htmlUsers)
 panelThread.setDaemon(True)

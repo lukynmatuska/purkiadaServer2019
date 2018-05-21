@@ -103,7 +103,7 @@ ENV/
 *.~*
 ~*.*
 
-/panel
+/panel/*.*
 /usersScore
 table*.xlsx*
 /Logs
@@ -114,3 +114,4 @@ testik.py
 testik*.*
 embed_qtconsole.py.py
 inprocess_qtconsole.py
+finishedUsers/finished_Users.txt
