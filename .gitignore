@@ -103,10 +103,10 @@ ENV/
 *.~*
 ~*.*
 
-/panel/*.*
-/usersScore
+panel/
+usersScore/
 table*.xlsx*
-/Logs
+Logs/
 example.ini
 pyQt_sracka.py
 QtConsole_GUI.py
@@ -114,5 +114,5 @@ testik.py
 testik*.*
 embed_qtconsole.py.py
 inprocess_qtconsole.py
-finishedUsers/finished_Users.txt
-finishedUsers/finished_Users.txt
+finishedUsers/
+usersScore/
