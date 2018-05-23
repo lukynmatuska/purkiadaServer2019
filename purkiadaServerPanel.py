@@ -2,6 +2,7 @@
 import threading
 import time
 import logging
+import json
 
 try:
     import dominate
@@ -51,8 +52,10 @@ class HtmlPage():
         self.page = dominate.document(title = self.title) #Object for HTML page
 
         with self.page.head: #Head editing
-            link(rel='stylesheet', href="http://cdn.muicss.com/mui-0.9.30/css/mui.min.css")#style.css')
-            script(type='text/javascript', src="http://cdn.muicss.com/mui-0.9.30/js/mui.min.js")#script.js")
+            link(rel='stylesheet', href="mui.min.css")#style.css')
+            #link(rel='stylesheet', href="http://cdn.muicss.com/mui-0.9.30/css/mui.min.css")#style.css')
+            #script(type='text/javascript', src="http://cdn.muicss.com/mui-0.9.30/js/mui.min.js")#script.js")
+            script(type='text/javascript', src="mui.min.js")#script.js")
             script(type='text/javascript', src="timer.js")#script.js")
             #meta(http-equiv="refresh", content="9")
             # <meta http-equiv="refresh" content="7;url=http://carodky.buchticka.eu/">
@@ -162,7 +165,7 @@ class HtmlPage():
             logging.info(e)
             
         
-home = HtmlPage("index", "Ahoj svete! z Homu", "Index")
+home = HtmlPage("index", ["Ahoj svete! z Homu"], "Index")
 status = HtmlPage("Status", ["Purkiada Server Panel was started!"], "Status")
 contact = HtmlPage("Contact", "Ahoj svete! z contact", "Contact")
 about = HtmlPage("About", "Ahoj svete! z about", "About")
