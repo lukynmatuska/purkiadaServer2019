@@ -1,0 +1,16 @@
+// config.json
+{
+  "SERVER": {
+    "port": 9600,
+    "ip": "0.0.0.0",
+    "MAX_IMAGE_SIZE": 5242880
+  },
+  "TEST": {
+    "TEST_TMP_DIR": "tests",
+    "TEST_TIMEOUT": 20
+  },
+  "CI": {
+    "SERVICE": "travis-ci",
+    "HOOK_URL": "web-hooking-url-from-ci-service"
+  }
+}

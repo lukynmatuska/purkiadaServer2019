@@ -16,7 +16,7 @@ class HtmlPage():
 
     def __init__(self, title, content, filename):
         self.lastAdd = ""
-        self.title = "{} - PurkiadaServer".format(title)
+        self.title = "{} - ServerPanel".format(title)
         self.titleMin = str(title)
         self.menuButtonName = title
 
@@ -66,7 +66,7 @@ class HtmlPage():
                         for name in self.menuList:  # MENU generating
                             #logging.info("NAME: {}".format(name))
                             if name == "home" or name == "Home":
-                                with a(href='./index.html'):
+                                with a(href='./'):
                                     button(name.titleMin, style="margin-left:auto;margin-right:auto;margin-top:auto;margin-bottom:auto;",cls="mui-btn mui-btn--primary mui-btn--raised")
                                     #p(name, style="margin-left:auto;margin-right:auto;margin-top:auto;margin-bottom:auto;",cls="mui-btn mui-btn--primary mui-btn--raised")
                             else:
@@ -101,10 +101,10 @@ class HtmlPage():
         while True:
             try:
                 if self.i == 1:
-                    self.f1 = open(".\\panel\{}.html".format(self.htmlFileName), "w")
+                    self.f1 = open(".\\panel\\{}.html".format(self.htmlFileName), "w")
                     #self.i = ""
                 else:
-                    self.f1 = open(".\\panel\{}{}.html".format(self.htmlFileName,self.i), "w")
+                    self.f1 = open(".\\panel\\{}{}.html".format(self.htmlFileName,self.i), "w")
                 self.f1.write(str(self.update()))#doc))
                 #f1.write(str(week.offerHtml))#doc))
                 self.f1.close()

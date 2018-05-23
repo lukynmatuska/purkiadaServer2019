@@ -4,6 +4,7 @@ import socket
 import threading
 import time
 import logging
+import json
 
 threading.current_thread().name = "Server"
 try:
@@ -30,11 +31,11 @@ except Exception as e:
 
 def loadPanel():
     try:
-    	import purkiadaServerPanel
+        import purkiadaServerPanel
     
     except Exception as e:
-    	logging.info("Error: \"{}\"\n".format(e))
-
+        logging.info("Error: \"{}\"\n".format(e))
+        input("\n           .: Press enter to EXIT :.\n\n")
 
 path = "home/"  # "default" ukazatel v jaké jsem složce
 accs = "tady musim nadefinovat globalni promennou, abych ji pak mohl pouzit ve funkci"
@@ -243,7 +244,7 @@ class User():
         return self.answerToClient  # self.pathList##pom
 
 
-class Directory():  # tvorba složky chyba by neměla být tady
+class Directory():  # tvorba složky
     def __init__(self, name, acess):
         self.name = name
         self.atribute = "directory"
@@ -293,7 +294,7 @@ Read_Me = File("read_me.txt", message, default_acess_list)
 data.add(Read_Me)
 # logs = Directory("logs",["admin"])
 # logs.add(users)
-Secret = File("secret_message.txt", "Well done you have pass the test \n write this text record sheet: MilujemeCitaceInstrukci",
+Secret = File("secret_message.txt", "Well done you have pass the exam \n write this text record sheet: \"MilujemeCitaceInstrukci\"",
               ["admin"])
 root = Directory("root", ["admin"])
 desktop.add(Secret)
@@ -312,41 +313,63 @@ home.add(root)
 # f1 = File("text.txt", "hello world",default_acess_list)
 
 class Server():
-	"""docstring for Server"""
-	def __init__(self, arg):
-		soc = socket.socket()
-		try:
-		    if len(sys.argv) > 1:
-		        logging.info("Trying to start server on *:{}".format(sys.argv[1]))
-		        soc.bind(("0.0.0.0", int(sys.argv[1])))
-		    else:
-		        logging.info("Trying to start server on *:9600")
-		        soc.bind(("0.0.0.0", 9600))
-		except Exception as problem:
-		    logging.info("Can´t start server, because {}".format(problem))
-		    input(".: EXIT :.")
-		    exit()
-		
-soc = socket.socket()
-try:
-    if len(sys.argv) > 1:
-        logging.info("Trying to start server on *:{}".format(sys.argv[1]))
-        soc.bind(("0.0.0.0", int(sys.argv[1])))
-    else:
-        logging.info("Trying to start server on *:9600")
-        soc.bind(("0.0.0.0", 9600))
-except Exception as problem:
-    logging.info("Can´t start server, because {}".format(problem))
-    input(".: EXIT :.")
-    exit()
+    """docstring for Server"""
+    def __init__(self):
+        self.soc = socket.socket()
+        try:
+            if len(sys.argv) > 1:
+                logging.info("Trying to start server on *:{}".format(sys.argv[1]))
+                self.soc.bind(("0.0.0.0", int(sys.argv[1])))
+            else:
+                try:
+                    self.openJson("config.json")
+                except Exception as e:
+                    logging.info("Error:    {}".format(e))
+                    logging.info("Loading config.json.default!")
+                    try:
+                        self.openJson("config.json.default")
+                    except Exception as e:
+                        raise e
+                if self.ip == "0.0.0.0":
+                    logging.info("Trying to start server on *:{}".format(self.port))
+                else:
+                    logging.info("Trying to start server on {}:{}".format(self.ip, self.port))
+                try:
+                    self.soc.bind((str(self.ip), int(self.port)))
+                    self.succStart()
+                except Exception as e:
+                    raise e
+        except Exception as e:
+            logging.info("Error:    {}".format(e))
+            input("\n           .: Press enter to EXIT :.\n\n")
+            exit()
+
+    def openJson(self, path):
+        try:
+            with open(path, 'r') as f:
+                self.config = json.load(f)
+                self.port = self.config['Server']['port'] # port for server
+                self.ip = "0.0.0.0" #self.config['SERVER']['ip'] # ip for server
+        except Exception as e:
+            raise e
+    
+    def succStart(self):
+        self.name = self.soc.getsockname()
+        if self.ip == "0.0.0.0":
+            logging.info("Server started on *:{}".format(self.name[1]))
+            #logging.info("Server started on *:{}".format(self.port))
+        else:
+            logging.info("Server started on {}:{}".format(self.name[0], self.name[1]))
+            #logging.info("Server started on {}:{}".format(self.ip, self.port))
+        self.soc.listen(1)
 
 
-name = soc.getsockname()
-logging.info("Server started on {}:{}".format(name[0], name[1]))
+
+server = Server()
 
 loadPanel()
 #print(name)
-soc.listen(1)
+
 banner = r"""
 ---------------------------------------------------------------------------
   _____               _     _             _          ___    ___  __   ___  
@@ -411,11 +434,11 @@ def one_user(c, a):
             action = c.recv(1024).decode("utf8")
             
             try:
-            	userLog = open("Logs\\{}_Log.txt".format(user.name), "a")
-            	userLog.write("[{}] {}: {}\n".format(time.time(),user.path, action))
-            	userLog.close()
+                userLog = open("Logs\\{}_Log.txt".format(user.name), "a")
+                userLog.write("[{}] {}: {}\n".format(time.time(),user.path, action))
+                userLog.close()
             except Exception as e:
-             	logging.info(e)
+                logging.info(e)
             
             if action == "read secret_message.txt" and user.path == "home/root/desktop/":
                 file = open("finishedUsers\\finished_Users.txt", "a")
@@ -451,41 +474,48 @@ def one_user(c, a):
         c.close()
 
 def htmlUsers():
-	import purkiadaServerPanel
-	import time
-	poprve = True
-	while True:
-		try:
-			if len(connectedUsersNames) > 0:
-				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-				#purkiadaServerPanel.status.add(purkiadaServerPanel.ul())
-				for userName in connectedUsersNames:
-					if userName not in statusUsersName:
-						purkiadaServerPanel.status.add(purkiadaServerPanel.li(str(userName)), "user") #connectedUsersNames)))
-						statusUsersName.append(userName)
-			elif poprve:
-				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-				purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"), "Active users:")
-				#purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-				purkiadaServerPanel.status.add(purkiadaServerPanel.li("Nikdo se jeste nepripojil!"), "Nikdo se jeste nepripojil!") #connectedUsersNames)))
-				poprve = False
-			purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
-			purkiadaServerPanel.status.add(purkiadaServerPanel.p("Last update on {}".format(time.asctime( time.localtime(time.time()) ))), "Last update on")
-			#.format(time.asctime( time.localtime(time.time()) ))
-			#purkiadaServerPanel.status.content += purkiadaServerPanel.p(connectedUsers)
-			purkiadaServerPanel.logging.info("Successfully writted!")
-			
-		except Exception as e:
-			logging.info("Error: {}".format(e))
-		time.sleep(5)
-
+    import purkiadaServerPanel
+    import time
+    poprve = True
+    while True:
+        try:
+            if len(connectedUsersNames) > 0:
+                #purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+                #purkiadaServerPanel.status.add(purkiadaServerPanel.ul())
+                for userName in connectedUsersNames:
+                    if userName not in statusUsersName:
+                        purkiadaServerPanel.status.add(purkiadaServerPanel.li(str(userName)), "user") #connectedUsersNames)))
+                        statusUsersName.append(userName)
+            elif poprve:
+                #purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+                purkiadaServerPanel.status.add(purkiadaServerPanel.h3("Active users:"), "Active users:")
+                #purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+                purkiadaServerPanel.status.add(purkiadaServerPanel.li("Nikdo se jeste nepripojil!"), "Nikdo se jeste nepripojil!") #connectedUsersNames)))
+                poprve = False
+            purkiadaServerPanel.status.add(purkiadaServerPanel.hr())
+            purkiadaServerPanel.status.add(purkiadaServerPanel.p("Last update on {}".format(time.asctime( time.localtime(time.time()) ))), "Last update on")
+            #.format(time.asctime( time.localtime(time.time()) ))
+            #purkiadaServerPanel.status.content += purkiadaServerPanel.p(connectedUsers)
+            purkiadaServerPanel.logging.info("Successfully writted!")
+            
+        except Exception as e:
+            logging.info("Error: {}".format(e))
+        try:
+            global server
+            reload = server.config['HTML Status']['reload'] # port for server
+        except Exception as e:
+            raise e
+        time.sleep(reload)
+        
+    
+    
 panelThread = threading.Thread(name="HTML Status", target=htmlUsers)
 panelThread.setDaemon(True)
 panelThread.start()
 #htmlUsers()
 
 while True:
-    c, a = soc.accept()
+    c, a = server.soc.accept()
     cThread = threading.Thread(target=one_user, args=(c, a))
     cThread.daemon = True
     cThread.start()

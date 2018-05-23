@@ -1,0 +1,14 @@
+{
+  "Server": {
+    "port": 9600,
+    "ip": "0.0.0.0"
+  },
+  "Panel": {
+    "path": [".\\panel", "C:\\xampp\\htdocs\\purkiadaServer2019"],
+    "delay": 20
+  },
+  "HTML Status": {
+    "reload": 10,
+    "HOOK_URL": "web-hooking-url-from-ci-service"
+  }
+}
